@@ -9,7 +9,7 @@ import plotly.express as px
 @st.cache_data
 def load_data():
     # replace with your data file
-    ds_merged = xr.open_dataset('D:/practice/fwi_analysis/fwi_new.nc')
+    ds_merged = xr.open_dataset('fwi_2015-2017.nc')
     return ds_merged
 
 
