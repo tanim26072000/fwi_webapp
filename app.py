@@ -3,6 +3,7 @@ import xarray as xr
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.colors as colors
 # Load your FWI dataset (adjust the path if necessary)
 
 
@@ -56,11 +57,26 @@ if analysis_scope == "Daily":
         fwi_df = xr_to_dataframe(fwi_data)
         # fwi_df['fwi_value'] = fwi_df['fwi_value'].apply(lambda x: f"{x:.2f}")
 
+        color_scale = px.colors.sequential.YlOrRd
+
         # Plot FWI map using Plotly
         fig = px.scatter_mapbox(
             fwi_df, lat="latitude", lon="longitude", color="fwi_value",
-            color_continuous_scale="YlOrRd", title=f"FWI Map for {date_selected}", zoom=2.5
+            color_continuous_scale=color_scale, title="FWI Map", zoom=2.5,
+            # Optional: fixed marker size for consistency
+            size=np.ones(len(fwi_df)) * 8
         )
+
+        # Optional: Customize hovertemplate if you want to format values
+        fig.update_traces(
+            hovertemplate=(
+                "<b>Latitude:</b> %{lat}<br>" +
+                "<b>Longitude:</b> %{lon}<br>" +
+                "<b>FWI Value:</b> %{marker.color:.2f}<br>"
+            )
+        )
+
+        # Set map style (replace with your Mapbox token if using a custom Mapbox style)
         fig.update_layout(mapbox_style="carto-positron")
         st.plotly_chart(fig)
 
