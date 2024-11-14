@@ -72,7 +72,7 @@ if analysis_scope == "Daily":
             color="fwi_value",
             color_continuous_scale=color_scale,
             range_color=[fwi_min, fwi_max],  # Set fixed color range
-            title="FWI Map",
+            title=f"FWI map for USA, {date_selected}",
             zoom=2.5
         )
 
