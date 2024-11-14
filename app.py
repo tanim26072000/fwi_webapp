@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.colors as colors
+import requests
 # Load your FWI dataset (adjust the path if necessary)
 
 
@@ -59,12 +60,20 @@ if analysis_scope == "Daily":
 
         color_scale = px.colors.sequential.YlOrRd
 
-        # Plot FWI map using Plotly
+        # Calculate the global min and max for FWI value across the dataset
+        fwi_min = fwi_df['fwi_value'].min()
+        fwi_max = fwi_df['fwi_value'].max()
+
+        # Plot FWI map using Plotly Express with consistent color range
         fig = px.scatter_mapbox(
-            fwi_df, lat="latitude", lon="longitude", color="fwi_value",
-            color_continuous_scale=color_scale, title="FWI Map", zoom=2.5,
-            # Optional: fixed marker size for consistency
-            size=np.ones(len(fwi_df)) * 8
+            fwi_df,
+            lat="latitude",
+            lon="longitude",
+            color="fwi_value",
+            color_continuous_scale=color_scale,
+            range_color=[fwi_min, fwi_max],  # Set fixed color range
+            title="FWI Map",
+            zoom=2.5
         )
 
         # Optional: Customize hovertemplate if you want to format values
@@ -76,8 +85,24 @@ if analysis_scope == "Daily":
             )
         )
 
-        # Set map style (replace with your Mapbox token if using a custom Mapbox style)
-        fig.update_layout(mapbox_style="carto-positron")
+        geojson_url = 'https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json'
+        response = requests.get(geojson_url)
+        geojson_data = response.json()
+
+        # Add state boundaries to the map
+        fig.update_layout(
+            mapbox_style="carto-positron",
+            mapbox_layers=[
+                {
+                    "source": geojson_data,
+                    "type": "line",
+                    "color": "black",  # State boundary color
+                    "line": {"width": 2},
+                }
+            ]
+        )
+
+        # Display the Plotly map in Streamlit
         st.plotly_chart(fig)
 
         # Histogram of FWI values
